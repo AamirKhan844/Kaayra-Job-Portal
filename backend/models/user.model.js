@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlengthL6,
+      minlength: 6,
       select: false, //user.find() pe password automatically response me  nhi aayega
     },
     phoneNumber: {

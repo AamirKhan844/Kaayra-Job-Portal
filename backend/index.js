@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
+import userRoutes from "./routes/user.route.js";
+import companyRoutes from "./routes/company.route.js";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -28,6 +30,11 @@ app.get("/", (req, res) => {
 });
 
 const port = process.env.PORT || 8000;
+//api's
+
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/company", companyRoutes);
+
 app.listen(port, () => {
   connectDB();
   console.log(`server is running on port ${port}`);

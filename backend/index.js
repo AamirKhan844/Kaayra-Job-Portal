@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import userRoutes from "./routes/user.route.js";
 import companyRoutes from "./routes/company.route.js";
+import jobRoutes from "./routes/job.route.js";
+import applicationRoutes from "./routes/application.route.js";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -34,6 +36,8 @@ const port = process.env.PORT || 8000;
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/company", companyRoutes);
+app.use("/api/v1/job", jobRoutes);
+app.use("/api/v1/application", applicationRoutes);
 
 app.listen(port, () => {
   connectDB();

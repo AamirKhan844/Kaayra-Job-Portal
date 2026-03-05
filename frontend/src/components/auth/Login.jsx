@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar";
 import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import axios from "axios";
+import { USER_API_ENDPOINT } from "@/utils/constant";
+import { toast } from "sonner";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
@@ -15,9 +17,20 @@ const Login = () => {
       [e.target.name]: e.target.value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(loginData);
+    try {
+      const res = await axios.post(`${USER_API_ENDPOINT}/login`, loginData, {
+        headers: "application/json",
+        withCredentials: true,
+      });
+      console.log(res.data);
+      if (res.data.success) {
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
   return (
     <>

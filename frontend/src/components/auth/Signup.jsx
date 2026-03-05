@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
+import axios from "axios";
+import { USER_API_ENDPOINT } from "@/utils/constant";
+import { toast } from "sonner";
 
 const Signup = () => {
   const [signUpData, setSignupData] = useState({
@@ -10,15 +13,38 @@ const Signup = () => {
     phoneNumber: "",
     role: "student",
   });
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setSignupData({
       ...signUpData,
       [e.target.name]: e.target.value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Optional photo
+    // if (profilePhoto) {
+    //   formData.append("profilePhoto", profilePhoto);
+    // }
     console.log(signUpData);
+    try {
+      const res = await axios.post(
+        `${USER_API_ENDPOINT}/register`,
+        signUpData,
+        {
+          headers: "application/json",
+          withCredentials: true,
+        },
+      );
+      console.log(res.data);
+      if (res.data.success) {
+        navigate("/login");
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <>
@@ -100,6 +126,18 @@ const Signup = () => {
                 <option value="recruiter">Recruiter</option>
               </select>
             </div>
+            {/* <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Profile Photo (Optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setProfilePhoto(e.target.files[0])}
+                className="w-full"
+              />
+            </div> */}
+
             <div className="flex items-center justify-center w-full ">
               <button
                 type="submit"

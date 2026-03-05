@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 const registerUser = async (req, res) => {
   try {
     const { fullname, email, password, phoneNumber, role } = req.body;
+    // const profilePhoto = req.file;
     // console.log(fullname, email, password, phoneNumber, role);
     if (!fullname || !email || !password || !phoneNumber || !role) {
       return res.status(400).json({
@@ -29,6 +30,7 @@ const registerUser = async (req, res) => {
     return res.status(201).json({
       message: "User created successfully",
       success: true,
+      file: req.file,
     });
   } catch (error) {
     return res.status(500).json({

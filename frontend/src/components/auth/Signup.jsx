@@ -4,6 +4,9 @@ import Navbar from "../Navbar";
 import axios from "axios";
 import { USER_API_ENDPOINT } from "@/utils/constant";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "@/store/authSlice";
+import { Loader2 } from "lucide-react";
 
 const Signup = () => {
   const [signUpData, setSignupData] = useState({
@@ -14,6 +17,8 @@ const Signup = () => {
     role: "student",
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((store) => store.auth);
   const handleChange = (e) => {
     setSignupData({
       ...signUpData,
@@ -29,11 +34,14 @@ const Signup = () => {
     // }
     console.log(signUpData);
     try {
+      dispatch(setLoading(true));
       const res = await axios.post(
         `${USER_API_ENDPOINT}/register`,
         signUpData,
         {
-          headers: "application/json",
+          headers: {
+            "Content-Type": "application/json",
+          },
           withCredentials: true,
         },
       );
@@ -43,7 +51,10 @@ const Signup = () => {
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error.response.data.message);
+      toast.error(error?.response?.data?.message || "something went wrong");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
   return (
@@ -137,15 +148,25 @@ const Signup = () => {
                 className="w-full"
               />
             </div> */}
-
-            <div className="flex items-center justify-center w-full ">
-              <button
-                type="submit"
-                className="w-[70%]  h-11 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer"
-              >
-                Submit
-              </button>
-            </div>
+            {loading ? (
+              <div className="flex items-center justify-center w-full ">
+                <button
+                  type="submit"
+                  className="w-[70%]  flex items-center justify-center gap-2 h-11 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" /> Signing Up....
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-full ">
+                <button
+                  type="submit"
+                  className="w-[70%]  h-11 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer"
+                >
+                  Submit
+                </button>
+              </div>
+            )}
           </form>
           <p className="text-md font-medium text-zinc-700 pt-4 text-center italic">
             Already have an Account?{" "}

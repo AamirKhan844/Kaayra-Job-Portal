@@ -4,8 +4,13 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { USER_API_ENDPOINT } from "@/utils/constant";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "@/store/authSlice";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((store) => store.auth);
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -20,8 +25,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_ENDPOINT}/login`, loginData, {
-        headers: "application/json",
+        headers: {
+          "Content-Type": "application/json",
+        },
         withCredentials: true,
       });
       console.log(res.data);
@@ -30,6 +38,8 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
   return (
@@ -86,14 +96,27 @@ const Login = () => {
                 <option value="recruiter">Recruiter</option>
               </select>
             </div>
-            <div className="w-full ">
-              <button
-                type="submit"
-                className="cursor-pointer bg-slate-900 p-2 rounded-xl w-full text-white hover:bg-slate-700"
-              >
-                Login
-              </button>
-            </div>
+            {loading ? (
+              <div className="w-full ">
+                <button
+                  disabled={loading}
+                  type="submit"
+                  className="cursor-pointer flex justify-center items-center gap-2 bg-slate-900 p-2 rounded-xl w-full text-white hover:bg-slate-700"
+                >
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Please Wait
+                </button>
+              </div>
+            ) : (
+              <div className="w-full ">
+                <button
+                  type="submit"
+                  className="cursor-pointer bg-slate-900 p-2 rounded-xl w-full text-white hover:bg-slate-700"
+                >
+                  Login
+                </button>
+              </div>
+            )}
           </form>
           <div className="text-center mt-2">
             <p className="text-md font-semibold text-gray-700">

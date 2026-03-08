@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "@/store/authSlice";
 import { Loader2 } from "lucide-react";
+import Footer from "../Footer";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -132,6 +133,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

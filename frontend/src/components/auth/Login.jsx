@@ -5,7 +5,7 @@ import axios from "axios";
 import { USER_API_ENDPOINT } from "@/utils/constant";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "@/store/authSlice";
+import { setLoading, setUser } from "@/store/authSlice";
 import { Loader2 } from "lucide-react";
 import Footer from "../Footer";
 
@@ -34,6 +34,7 @@ const Login = () => {
         withCredentials: true,
       });
       console.log(res.data);
+      dispatch(setUser(res.data.user));
       if (res.data.success) {
         toast.success(res.data.message);
       }

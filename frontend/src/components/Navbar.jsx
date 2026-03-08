@@ -12,8 +12,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, UserPen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 const Navbar = () => {
-  const user = false;
+  const { user } = useSelector((store) => store.auth);
+
+  const handleLogout = () => {};
   return (
     <>
       <div className="bg-white border-b sticky top-0 z-50">
@@ -74,18 +77,25 @@ const Navbar = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 ">
-                      <Button
-                        variant="link"
-                        className="cursor-pointer w-fit  text-gray-600"
-                      >
-                        <UserPen /> Profile
-                      </Button>
-                      <Button
-                        variant="link"
-                        className="cursor-pointer w-fit text-gray-600"
-                      >
-                        <LogOut></LogOut> Logout
-                      </Button>
+                      <Link to={"/profile"}>
+                        <Button
+                          variant="link"
+                          className="cursor-pointer w-fit  text-gray-600"
+                        >
+                          <UserPen /> Profile
+                        </Button>
+                      </Link>
+
+                      <>
+                        <Link>
+                          <Button
+                            variant="link"
+                            className="cursor-pointer w-fit text-gray-600"
+                          >
+                            <LogOut></LogOut> Logout
+                          </Button>
+                        </Link>
+                      </>
                     </div>
                   </PopoverContent>
                 </Popover>

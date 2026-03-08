@@ -28,8 +28,12 @@ const Navbar = () => {
           <div>
             <ul className="flex items-center gap-5 h-full ">
               <Link to={"/"}>Home</Link>
-              <li>Browse</li>
-              <li>Jobs</li>
+              <li>
+                <Link to={"/browse"}>Browse</Link>{" "}
+              </li>
+              <li>
+                <Link to={"/jobs"}>Jobs</Link>
+              </li>
               {!user ? (
                 <div className="flex items-center  gap-4">
                   <Link to={"/login"}>

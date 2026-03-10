@@ -10,13 +10,37 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { Button } from "@/components/ui/button";
-import { LogOut, UserPen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { CircleCheckBigIcon, LogOut, UserPen } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "@/store/authSlice";
+import axios from "axios";
+import { USER_API_ENDPOINT } from "@/utils/constant";
+import { toast } from "sonner";
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
 
-  const handleLogout = () => {};
+  const naviagte = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post(
+        `${USER_API_ENDPOINT}/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      if (res.data.success) {
+        toast.success(res.data.message);
+        naviagte("/");
+        dispatch(setUser(null));
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <>
       <div className="bg-white border-b sticky top-0 z-50">
@@ -37,6 +61,17 @@ const Navbar = () => {
               <li>
                 <Link to={"/jobs"}>Jobs</Link>
               </li>
+              {user ? (
+                <Link to={"/profile/applied-jobs"}>
+                  <Button
+                    variant="outline"
+                    className="hover:cursor-pointer bg-green-600 hover:bg-green-500 tracking-wider"
+                  >
+                    <CircleCheckBigIcon className="text-white font-bold"></CircleCheckBigIcon>{" "}
+                    Applied Jobs
+                  </Button>
+                </Link>
+              ) : null}
               {!user ? (
                 <div className="flex items-center  gap-4">
                   <Link to={"/login"}>
@@ -70,9 +105,11 @@ const Navbar = () => {
                         <AvatarImage src="https://github.com/shadcn.png" />
                       </Avatar>
                       <div>
-                        <h2 className="text-md">Aamir khan</h2>
+                        <h2 className="text-md tracking-wide text-gray-700 font-semibold">
+                          {user.fullname.toUpperCase()}
+                        </h2>
                         <p className="text-sm text-muted-foreground tracking-widest italic">
-                          Best coder in the world!
+                          {user.profile?.bio}
                         </p>
                       </div>
                     </div>
@@ -89,6 +126,7 @@ const Navbar = () => {
                       <>
                         <Link>
                           <Button
+                            onClick={handleLogout}
                             variant="link"
                             className="cursor-pointer w-fit text-gray-600"
                           >

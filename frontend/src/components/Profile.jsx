@@ -2,20 +2,30 @@ import React, { useState } from "react";
 import { User, Pencil } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { USER_API_ENDPOINT } from "@/utils/constant";
+import { toast } from "sonner";
+import { setLoading } from "@/store/authSlice";
 
 const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
+  const { user } = useSelector((store) => store.auth);
+  const { loading } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    email: "aamir.khan152472@gmail.com",
-    name: "Smart Dragon",
-    phone: "",
-    location: "",
-    linkedin: "",
+    email: user?.email,
+    name: user?.fullname,
+    phone: user?.phoneNumber,
+    bio: user?.profile?.bio,
+    skills: user?.profile?.skills.map((skill) => skill) || "",
     github: "",
     role: "",
-    resume: null,
+    resume: user?.profile?.resume,
   });
+
+  // console.log(formData.bio);
 
   const handleChange = (e) => {
     setFormData({
@@ -31,9 +41,33 @@ const ProfilePage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    const data = new FormData();
+    data.append("email", formData.email);
+    data.append("fullname", formData.name);
+    data.append("phoneNumber", formData.phone);
+    data.append("bio", formData.bio);
+    data.append("skills", JSON.stringify(formData.skills));
+    if (formData.resume) {
+      data.append("resume", formData.resume);
+    }
+    try {
+      dispatch(setLoading(true));
+      const res = await axios.put(`${USER_API_ENDPOINT}/profile/update`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   return (
@@ -104,10 +138,10 @@ const ProfilePage = () => {
 
             {/* Location */}
             <div>
-              <label className="text-sm font-medium">Location</label>
+              <label className="text-sm font-medium">Bio</label>
               <input
-                name="location"
-                value={formData.location}
+                name="bio"
+                value={formData.bio}
                 onChange={handleChange}
                 disabled={!editMode}
                 className="w-full mt-1 border rounded-lg p-2"
@@ -116,18 +150,20 @@ const ProfilePage = () => {
 
             {/* LinkedIn */}
             <div className="col-span-2">
-              <label className="text-sm font-medium">LinkedIn</label>
+              <label className="text-sm font-medium">Skills</label>
               <input
-                name="linkedin"
-                value={formData.linkedin}
+                type="text"
+                name="skills"
+                value={formData.skills}
                 onChange={handleChange}
                 disabled={!editMode}
+                placeholder="HTML,CSS, JS"
                 className="w-full mt-1 border rounded-lg p-2"
               />
             </div>
 
             {/* GitHub */}
-            <div className="col-span-2">
+            {/* <div className="col-span-2">
               <label className="text-sm font-medium">GitHub</label>
               <input
                 name="github"
@@ -136,7 +172,7 @@ const ProfilePage = () => {
                 disabled={!editMode}
                 className="w-full mt-1 border rounded-lg p-2"
               />
-            </div>
+            </div> */}
 
             {/* Role */}
 
@@ -145,6 +181,7 @@ const ProfilePage = () => {
               <label className="text-sm font-medium">Upload Resume</label>
 
               <input
+                name="resume"
                 type="file"
                 accept=".pdf,.doc,.docx"
                 onChange={handleResumeUpload}
@@ -152,6 +189,7 @@ const ProfilePage = () => {
                 className="w-full mt-1 border rounded-lg p-2"
               />
             </div>
+            <h1>{user?.profile?.resumeOriginalName}</h1>
 
             {/* Save Button */}
             {editMode && (

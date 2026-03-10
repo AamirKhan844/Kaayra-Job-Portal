@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import getDataUri from "../utils/dataUri.js";
+import cloudinary from "../utils/cloudinary.js";
 const registerUser = async (req, res) => {
   try {
     const { fullname, email, password, phoneNumber, role } = req.body;
@@ -105,12 +107,19 @@ const logoutUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    const userId = req.userId;
-    const user = await User.findById(userId);
+    const file = req.file;
+    // const { resume } = req.file;
+    console.log(req.file);
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
+    console.log(fullname, email, phoneNumber, bio, skills);
+    // const userId = req.userId;
+    const user = await User.findById(req.user._id);
     console.log(user);
     if (!user) {
       return res.status(404).json({
-        message: "User not found",
+        message: "User not hh found",
         success: false,
       });
     }
@@ -120,6 +129,10 @@ const updateUser = async (req, res) => {
     if (bio) user.profile.bio = bio;
     if (skills) {
       user.profile.skills = skills.split(",");
+    }
+    if (req.file) {
+      user.profile.resume = cloudResponse.secure_url;
+      user.profile.resumeOriginalName = file.originalname;
     }
     await user.save();
     return res.status(200).json({

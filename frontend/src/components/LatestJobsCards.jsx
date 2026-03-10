@@ -1,10 +1,16 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { Bookmark } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 const LatestJobsCards = () => {
+  const navigate = useNavigate();
+  const jobId = "12345";
   return (
     <>
-      <div className=" rounded-xl shadow-lg border-b py-8 px-4">
+      <div
+        onClick={() => navigate(`/description/${jobId}`)}
+        className=" rounded-xl shadow-lg border-b py-8 px-4 hover:cursor-pointer"
+      >
         <div className="flex justify-between">
           <div className="flex  justify-center gap-4">
             <div className="">

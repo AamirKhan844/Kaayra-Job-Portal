@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { USER_API_ENDPOINT } from "@/utils/constant";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import Footer from "../Footer";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { loading } = useSelector((store) => store.auth);
   const [loginData, setLoginData] = useState({
     email: "",
@@ -37,6 +38,7 @@ const Login = () => {
       dispatch(setUser(res.data.user));
       if (res.data.success) {
         toast.success(res.data.message);
+        navigate("/");
       }
     } catch (error) {
       toast.error(error.response.data.message);

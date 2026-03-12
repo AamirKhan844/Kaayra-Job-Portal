@@ -2,19 +2,27 @@ import test from "node:test";
 import Company from "../models/company.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
+import getDataUri from "../utils/dataUri.js";
+import cloudinary from "../utils/cloudinary.js";
 //registering the company//
 
 const registerCompany = async (req, res) => {
   try {
     const { name, description, location, website } = req.body;
     console.log(name, description, location, website);
+    const file = req.file;
+    console.log(file);
     const userId = req.user._id;
+    let logo;
+
     if (!name || !description || !location || !website) {
       return res.status(400).json({
         message: "All fields are mandatory",
         success: false,
       });
     }
+
+    // console.log(`logo ${file}`);
     const existingCompany = await Company.findOne({ name });
     if (existingCompany) {
       return res.status(400).json({
@@ -29,17 +37,26 @@ const registerCompany = async (req, res) => {
         success: false,
       });
     }
+    if (file) {
+      const fileUri = getDataUri(file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      logo = cloudResponse.secure_url;
+      console.log(cloudResponse.secure_url);
+    }
     const company = await Company.create({
       name,
       description,
       location,
       website,
+      logo,
       createdBy: userId,
     });
+
+    // console.log(cloudResponse.secure_url);
     return res.status(201).json({
       message: "Company created successfully",
       success: true,
-      data: company,
+      company,
     });
   } catch (error) {
     return res.status(500).json({
@@ -103,7 +120,7 @@ const getCompanies = async (req, res) => {
     return res.status(200).json({
       message: "Companies fetched successfully",
       success: true,
-      data: companies,
+      companies,
     });
   } catch (error) {
     return res.status(500).json({

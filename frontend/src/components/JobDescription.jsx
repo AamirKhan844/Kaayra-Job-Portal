@@ -3,29 +3,90 @@ import Navbar from "./Navbar";
 import { FaInstagram, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { Button } from "./ui/button";
 import Footer from "./Footer";
+import { useParams } from "react-router-dom";
+import useGetSingleJob from "@/hooks/useGetSingleJob";
+import { useDispatch, useSelector } from "react-redux";
+import store from "@/store/store";
+import axios from "axios";
+import { APPLICATION_API_ENDPOINT } from "@/utils/constant";
+import { toast } from "sonner";
+import { setSingleJob } from "@/store/jobSlice";
 
+export const daysAgo = (createdAt_mongo) => {
+  const createdAt = new Date(createdAt_mongo);
+  console.log(`mongodb time ${createdAt}`);
+  const currentDate = new Date();
+  console.log(`current date ${currentDate}`);
+  const timeDiff = currentDate - createdAt;
+  console.log(`time diff= ${timeDiff}`);
+  const daysDiff = Math.floor(timeDiff / (1000 * 24 * 60 * 60));
+  return daysDiff === 0 ? "Today" : `${daysDiff} days ago`;
+};
 const JobDescription = () => {
-  const isApplied = false;
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+
+  const params = useParams();
+  console.log(params);
+  const jobId = params.id;
+  useGetSingleJob(jobId);
+  const { singleJob } = useSelector((store) => store.job);
+  const isApplied =
+    singleJob?.applications?.some(
+      (application) => application.applicant === user?._id,
+    ) || false;
+
+  const handleApply = async () => {
+    try {
+      const res = await axios.post(
+        `${APPLICATION_API_ENDPOINT}/${jobId}`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      if (res.data.message) {
+        const updatedJob = {
+          ...singleJob,
+          applications: [
+            ...singleJob.applications,
+            {
+              applicant: user._id,
+            },
+          ],
+        };
+        dispatch(setSingleJob(updatedJob));
+
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <>
       <Navbar />
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-2">
-        <p className="text-sm font-semibold text-gray-600">08 March 2026</p>
+        <p className="text-sm font-semibold text-gray-600">
+          {daysAgo(singleJob?.createdAt)}
+        </p>
         <p className="text-4xl font-semibold tracking-wider">
-          Tesla, Inc. is hiring for Frontend Software Engineer | Delhi
+          {singleJob?.company?.name} is hiring for {singleJob?.title}|{" "}
+          {singleJob?.location}
         </p>
         <div className="flex gap-5 mt-5">
           <p className="bg-slate-900 text-gray-200 rounded-lg text-sm font-semibold py-1 px-2">
-            full-time
+            {singleJob?.jobType}
           </p>
           <p className="bg-slate-900 text-gray-200 rounded-lg text-sm font-semibold py-1 px-2">
-            15LPA
+            {singleJob?.salary}LPA
           </p>
           <p className="bg-slate-900 text-gray-200 rounded-lg text-sm font-semibold py-1 px-2">
-            0Years{" "}
+            {singleJob?.experienceLevel}{" "}
           </p>
           <p className="bg-slate-900 text-gray-200 rounded-lg text-sm font-semibold py-1 px-2">
-            10 Positions
+            {singleJob?.vacancies} Positions
           </p>
         </div>
         <div className="flex items-center gap-5 mt-5">
@@ -85,6 +146,7 @@ const JobDescription = () => {
         </div>
         <div className="text-center mt-4">
           <Button
+            onClick={isApplied ? "null" : handleApply}
             className={`${isApplied ? "cursor-not-allowed bg-gray-600" : "cursor-pointer"}`}
           >
             {isApplied ? "Already Applied" : "Apply to This Job"}

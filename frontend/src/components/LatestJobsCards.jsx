@@ -1,14 +1,15 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { Bookmark } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-const LatestJobsCards = () => {
+import { useNavigate, useParams } from "react-router-dom";
+import { daysAgo } from "./JobDescription";
+const LatestJobsCards = ({ job }) => {
   const navigate = useNavigate();
-  const jobId = "12345";
+
   return (
     <>
       <div
-        onClick={() => navigate(`/description/${jobId}`)}
+        onClick={() => navigate(`/description/${job._id}`)}
         className=" rounded-xl shadow-lg border-b py-8 px-4 hover:cursor-pointer"
       >
         <div className="flex justify-between">
@@ -22,21 +23,21 @@ const LatestJobsCards = () => {
             </div>
             <div className="">
               <p className="text-lg font-semibold">
-                Red Hat is hiring for Trainee - Associate Software Engineer |
-                Bangalore
+                {job?.company?.name} is hiring for {job?.title} |{" "}
+                {job?.location}
               </p>
               <p className="text-sm text-slate-500 mt-2 ">
-                Admin • 08 March 2026
+                Admin • {daysAgo(job?.createdAt)}
               </p>
               <div className="flex items-center gap-5 mt-2 ">
                 <p className="bg-gray-200 text-sm font-semibold  rounded-full px-4 py-1">
-                  Full Time
+                  {job?.jobType}
                 </p>
                 <p className="bg-gray-200 text-sm font-semibold  rounded-full px-4 py-1">
-                  5-10Lpa
+                  {job?.salary}Lpa
                 </p>
                 <p className="bg-gray-200 text-sm font-semibold  rounded-full px-4 py-1">
-                  0 Years
+                  {job?.experienceLevel}
                 </p>
               </div>
             </div>

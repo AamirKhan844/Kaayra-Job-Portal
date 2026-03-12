@@ -101,16 +101,17 @@ const getAllJobs = async (req, res) => {
         },
       ],
     };
-    const jobs = await Job.find(query);
+    const jobs = await Job.find(query).populate("company");
     if (jobs.length === 0) {
       return res.status(200).json({
         message: "No Jobs Available",
         success: false,
       });
     }
+    console.log(jobs);
     return res.status(200).json({
       message: "Avaailable jobs are",
-      data: jobs,
+      jobs,
       success: true,
     });
   } catch (error) {
@@ -130,7 +131,7 @@ const getJobById = async (req, res) => {
         success: false,
       });
     }
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate("company applications");
     if (!job) {
       return res.status(404).json({
         message: "Job not found",
@@ -138,8 +139,9 @@ const getJobById = async (req, res) => {
       });
     }
     return res.status(200).json({
+      success: true,
       message: "Job found successfully",
-      data: job,
+      job,
     });
   } catch (error) {
     return res.status(500).json({
@@ -173,5 +175,13 @@ const getAdminJobs = async (req, res) => {
     });
   }
 };
+// const appliedJobs = async (req, res) => {
+//   try {
+//     const userId = req.user._id;
+//     const jobs=await Job.find({
+
+//     })
+//   } catch (error) {}
+// };
 
 export { createJob, getAdminJobs, getAllJobs, getJobById };

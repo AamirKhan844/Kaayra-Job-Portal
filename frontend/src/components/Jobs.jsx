@@ -3,9 +3,10 @@ import Navbar from "./Navbar";
 import FilterCard from "./FilterCard";
 import Job from "./Job";
 import LatestJobsCards from "./LatestJobsCards";
+import { useSelector } from "react-redux";
 
 const Jobs = () => {
-  const job = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const { allJobs } = useSelector((store) => store.job);
   return (
     <>
       <Navbar />
@@ -15,10 +16,10 @@ const Jobs = () => {
             <FilterCard />
           </div>
           <div className="col-span-9">
-            {job.map((job, index) => {
+            {allJobs.map((job, index) => {
               return (
                 <div className="mb-4">
-                  <LatestJobsCards />
+                  <LatestJobsCards key={job._id} job={job} />
                 </div>
               );
             })}

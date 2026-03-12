@@ -54,14 +54,26 @@ const Navbar = () => {
           </div>
           <div>
             <ul className="flex items-center gap-5 h-full ">
-              <Link to={"/"}>Home</Link>
-              <li>
-                <Link to={"/browse"}>Browse</Link>{" "}
-              </li>
-              <li>
-                <Link to={"/jobs"}>Jobs</Link>
-              </li>
-              {user ? (
+              {user && user?.role === "recruiter" ? (
+                <>
+                  <Link to={"/"}>Company</Link>
+                  <li>
+                    <Link to={"/browse"}>Jobs</Link>{" "}
+                  </li>
+                </>
+              ) : (
+                <>
+                  <Link to={"/"}>Home</Link>
+                  <li>
+                    <Link to={"/browse"}>Browse</Link>{" "}
+                  </li>
+                  <li>
+                    <Link to={"/jobs"}>Jobs</Link>
+                  </li>
+                </>
+              )}
+
+              {user?.role === "student" ? (
                 <Link to={"/profile/applied-jobs"}>
                   <Button
                     variant="outline"
@@ -113,15 +125,18 @@ const Navbar = () => {
                         </p>
                       </div>
                     </div>
+
                     <div className="flex flex-col gap-2 ">
-                      <Link to={"/profile"}>
-                        <Button
-                          variant="link"
-                          className="cursor-pointer w-fit  text-gray-600"
-                        >
-                          <UserPen /> Profile
-                        </Button>
-                      </Link>
+                      {user?.role === "student" && (
+                        <Link to={"/profile"}>
+                          <Button
+                            variant="link"
+                            className="cursor-pointer w-fit  text-gray-600"
+                          >
+                            <UserPen /> Profile
+                          </Button>
+                        </Link>
+                      )}
 
                       <>
                         <Link>
